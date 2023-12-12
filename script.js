@@ -1,53 +1,95 @@
-/*** Menu ***/
+// toggle icon navbar
+let menuIcon = document.querySelector("#menu-icon");
+let navbar = document.querySelector(".navbar");
 
-((d) =>{
-    const $btnMenu = d.querySelector(".menu-btn"),
-    $menu = d.querySelector(".menu");
+menuIcon.onclick = () => {
+  menuIcon.classList.toggle("bx-x");
+  navbar.classList.toggle("active");
+};
 
-    $btnMenu.addEventListener("click",e=> {
-        $btnMenu.firstElementChild.classList.toggle("none");
-        $btnMenu.lastElementChild.classList.toggle("none");
-        $menu.classList.toggle("is-active");
-    });
+// scroll sections
+let sections = document.querySelectorAll("section");
+let navLinks = document.querySelectorAll("header nav a");
 
-    d.addEventListener("click",e=>{
-        if(!e.target.matches(".menu a"))return false;
-        $btnMenu.firstElementChild.classList.remove("none");
-        $btnMenu.lastElementChild.classList.add("none");
-        $menu.classList.remove("is-active");
-    });
-})(document);
+window.onscroll = () => {
+  sections.forEach((sec) => {
+    let top = window.scrollY;
+    let offset = sec.offsetTop - 100;
+    let height = sec.offsetHeight;
+    let id = sec.getAttribute("id");
 
-/*** Contact Form ***/
+    if (top >= offset && top < offset + height) {
+      // active navbar links
+      navLinks.forEach((links) => {
+        links.classList.remove("active");
+        document
+          .querySelector("header nav a[href*=" + id + "]")
+          .classList.add("active");
+      });
+
+      // active section for animation on scroll
+      sec.classList.add("show-animate");
+    }
+    // if want to use animation that repeats on scroll use this
+    else {
+      sec.classList.remove("show-animate");
+    }
+  });
+
+  // sticky header
+
+  let header = document.querySelector("header");
+
+  header.classList.toggle("sticky", window.scrollY > 100);
+
+  // remove toggle icon and navbar when click navbar links (scroll)
+
+  menuIcon.classList.remove("bx-x");
+  navbar.classList.remove("active");
+
+  // animation footer on scroll
+
+  let footer = document.querySelector("footer");
+
+  footer.classList.toggle(
+    "show-animate",
+    this.innerHeight + this.scrollY >= document.scrollingElement.scrollHeight
+  );
+};
+
+// contact form
 
 ((d) => {
-    const $form = d.querySelector(".contact-form"),
+  const $form = d.querySelector(".contact-form"),
     $loader = d.querySelector(".contact-form-loader"),
     $response = d.querySelector(".contact-form-response");
 
-    $form.addEventListener("submit",(e)=> {
-        e.preventDefault();
-        $loader.classList.remove("none");
-        fetch("https://formsubmit.co/ajax/juanse1990@live.com.ar", {
-            method:"POST",
-            body:new FormData(e.target),
-        })
-        .then((res) => (res.ok ? res.json(): Promise.reject(res)))
-        .then(json => {
-            console.log(json);
-            location.hash = "#gracias";
-            $form.reset();
-        })
-        .catch(err => {
-            console.log(err);
-            let message = err.statusText || "Ocurrió un error al enviar, intenta nuevamente";
-            $response.querySelector("h3").innerHTML = `Error ${err.status}: ${message}`;
-        })
-        .finally(() => {
-            $loader.classList.add("none");
-            setTimeout(() => {
-                location.hash = "#close";
-            }, 3000);
-        });
-    });
+  $form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    $loader.classList.remove("none");
+    fetch("https://formsubmit.co/ajax/juanse1990@live.com.ar", {
+      method: "POST",
+      body: new FormData(e.target),
+    })
+      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+      .then((json) => {
+        console.log(json);
+        location.hash = "#thanks";
+        $form.reset();
+      })
+      .catch((err) => {
+        console.log(err);
+        let message =
+          err.statusText || "An error occurred while sending. Please try again";
+        $response.querySelector(
+          "h3"
+        ).innerHTML = `Error ${err.status}: ${message}`;
+      })
+      .finally(() => {
+        $loader.classList.add("none");
+        setTimeout(() => {
+          location.hash = "#close";
+        }, 3000);
+      });
+  });
 })(document);
